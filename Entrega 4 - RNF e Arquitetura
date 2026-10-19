@@ -1,0 +1,132 @@
+#Descrição
+Identificar e classificar os requisitos não funcionais (RNFs) do projeto e demonstrar como esses requisitos influenciam as decisões de arquitetura do sistema.
+
+---
+
+## 1. Integrantes do Grupo
+* Pedro Lucas
+* Maria Fernanda
+* Júlia Beatriz
+---
+
+## 2. Requisitos Não Funcionais (RNFs) e Classificação
+Os requisitos foram organizados em categorias de qualidade relevantes para as funcionalidades previstas no projeto.
+
+### 2.1 Desempenho e Eficiência
+* **RNF01 — Tempo de resposta:** As telas de cadastro, consulta e atualização de informações devem responder em até 2 segundos em condições normais de uso, desconsiderando atrasos externos de rede ou de serviços de terceiros.
+* **RNF02 — Busca de profissionais:** A pesquisa e a aplicação de filtros devem retornar os resultados em até 3 segundos para uma base de dados de até 10.000 profissionais cadastrados, considerando infraestrutura e condições de teste previamente definidas.
+* **RNF03 — Processamento de chamados:** As operações de aceite e recusa de chamados devem atualizar o status em até 2 segundos, em condições normais de uso.
+
+### 2.2 Segurança, Confidencialidade, Integridade e Controle de Acesso
+* **RNF04 — Proteção de dados pessoais:** Os dados pessoais dos clientes e prestadores devem ser acessíveis somente a usuários e serviços autorizados.
+* **RNF05 — Proteção de documentos:** Os documentos enviados para validação, incluindo RG e antecedente criminal, devem ser armazenados com acesso restrito e protegidos contra divulgação indevida.
+* **RNF06 — Autenticação e autorização:** O sistema deve exigir autenticação para operações que dependam de uma conta e verificar as permissões do usuário antes de permitir alterações em perfis, documentos e chamados.
+* **RNF07 — Integridade da verificação:** Um profissional somente poderá receber o status “Verificado” após a aprovação da validação documental. O envio dos documentos, por si só, não deve liberar esse status.
+* **RNF08 — Proteção das comunicações:** As comunicações entre o aplicativo e o servidor devem utilizar HTTPS com TLS, protegendo os dados durante a transmissão.
+
+### 2.3 Usabilidade, Acessibilidade da Interação e Feedback ao Usuário
+* **RNF09 — Facilidade de cadastro:** As telas de cadastro de clientes e prestadores devem apresentar campos identificados, instruções claras e mensagens de erro compreensíveis.
+* **RNF10 — Facilidade de busca:** Os filtros de preço, avaliação e disponibilidade devem ser apresentados de maneira clara, permitindo que o usuário compreenda e aplique os critérios de pesquisa.
+* **RNF11 — Orientação durante a validação:** A interface deve informar quais documentos são necessários, se o envio foi realizado e qual é o estado da validação documental.
+* **RNF12 — Feedback das operações:** O sistema deve informar ao usuário quando uma operação for concluída, falhar ou estiver em processamento, incluindo as operações de aceite e recusa de chamados.
+
+### 2.4 Confiabilidade, Disponibilidade e Recuperabilidade
+* **RNF13 — Consistência dos dados:** As alterações em perfis, status de verificação e chamados devem manter os dados consistentes, mesmo quando ocorrerem falhas durante uma operação.
+* **RNF14 — Disponibilidade:** O sistema deve buscar disponibilidade mensal de 99,5%, considerando uma infraestrutura monitorada e excluindo as janelas de manutenção previamente acordadas.
+* **RNF15 — Recuperação de falhas:** O sistema deve permitir a recuperação dos dados após falhas por meio de cópias de segurança periódicas e procedimentos de restauração testados.
+
+### 2.5 Manutenibilidade, Modularidade e Testabilidade
+* **RNF16 — Facilidade de manutenção:** O sistema deve organizar suas responsabilidades em módulos separados, facilitando a correção de erros e a inclusão de novas funcionalidades.
+* **RNF17 — Testabilidade:** As principais funcionalidades devem possuir testes que verifiquem seus critérios de aceitação, incluindo cenários de sucesso, falha e acesso não autorizado.
+---------
+
+## 3. Relação dos RNFs com as Histórias de Usuário
+
+As histórias de usuário abaixo são baseadas no backlog da Sprint 1 e no documento de gestão de mudanças do Mão na Roda.
+
+| História de Usuário | Descrição | RNFs Relacionados |
+| :--- | :--- | :--- |
+| **US 1.1** | Cadastro de autônomo | RNF01, RNF04, RNF06, RNF09, RNF13, RNF16 e RNF17 |
+| **US 1.2** | Cadastro de cliente | RNF01, RNF04, RNF06, RNF09, RNF13 e RNF17 |
+| **US 1.3** | Validação de documentos | RNF04, RNF05, RNF06, RNF07, RNF08, RNF11, RNF13 e RNF17 |
+| **US 2.1** | Localização de profissionais | RNF01, RNF02, RNF04, RNF06, RNF13 e RNF14 |
+| **US 2.2** | Filtros avançados de busca | RNF01, RNF02, RNF09, RNF10 e RNF17 |
+| **US 4.1** | Aceite e recusa de chamados | RNF01, RNF03, RNF06, RNF12, RNF13 e RNF17 |
+| **US 1.5** | Recuperação de acesso | RNF04, RNF06, RNF08, RNF09 e RNF17 |
+
+---
+
+## 4. Decisões Arquiteturais Motivadas pelos RNFs
+
+### DA01 — Arquitetura modular em camadas
+* **Decisão:** Organizar o sistema em camadas de interface, aplicação, domínio e persistência de dados.
+* **RNFs relacionados:** RNF16 e RNF17.
+* **Justificativa:** A separação das responsabilidades facilita a manutenção e a realização de testes. Alterações na interface, por exemplo, poderão ser feitas sem modificar diretamente as regras de validação de documentos ou de gerenciamento de chamados.
+* **Impacto esperado:** Maior organização do código, facilidade de evolução e redução do acoplamento entre componentes.
+
+### DA02 — Banco de dados relacional
+* **Decisão:** Utilizar um banco de dados relacional para armazenar usuários, perfis, documentos e chamados, com relacionamentos e restrições de integridade.
+* **RNFs relacionados:** RNF13, RNF15 e RNF17.
+* **Justificativa:** O projeto precisa manter relações consistentes entre clientes, prestadores, validações e chamados. As transações do banco de dados ajudam a garantir que operações relacionadas sejam concluídas de forma consistente.
+* **Impacto esperado:** Maior integridade dos dados, facilidade de consulta e suporte à recuperação após falhas.
+
+### DA03 — Autenticação e controle de acesso
+* **Decisão:** Implementar autenticação e autorização no servidor, com permissões definidas de acordo com o perfil do usuário e a operação solicitada.
+* **RNFs relacionados:** RNF04, RNF05, RNF06 e RNF07.
+* **Justificativa:** A validação documental envolve informações pessoais que não devem ficar disponíveis publicamente. O servidor precisa verificar as permissões de cada operação, impedindo que usuários não autorizados visualizem documentos ou alterem o estado de verificação de um profissional.
+* **Impacto esperado:** Redução do risco de acesso indevido e maior proteção dos dados pessoais.
+
+### DA04 — Armazenamento privado de documentos
+* **Decisão:** Armazenar os documentos em um repositório privado, separado do acesso público aos perfis, utilizando referências aos arquivos no banco de dados e permissões restritas para leitura e validação.
+* **RNFs relacionados:** RNF04, RNF05, RNF06 e RNF08.
+* **Justificativa:** Os documentos enviados para validação não devem ser disponibilizados como arquivos públicos. A separação do armazenamento e a autorização no servidor permitem controlar quem pode consultar os arquivos.
+* **Impacto esperado:** Maior confidencialidade dos documentos e redução do risco de exposição indevida.
+
+### DA05 — Busca otimizada por localização e filtros
+* **Decisão:** Utilizar consultas otimizadas no banco de dados, índices para os campos de pesquisa e, quando necessário, recursos de consulta geográfica para localizar profissionais próximos.
+* **RNFs relacionados:** RNF01, RNF02 e RNF14.
+* **Justificativa:** A localização e os filtros de preço, avaliação e disponibilidade exigem consultas eficientes. Os índices reduzem a necessidade de examinar todos os registros em cada pesquisa.
+* **Impacto esperado:** Menor tempo de resposta e maior eficiência nas pesquisas de profissionais.
+
+### DA06 — Fluxo de validação documental com estados definidos
+* **Decisão:** Modelar a validação documental como um fluxo de estados, por exemplo: *Pendente*, *Em análise*, *Aprovado* e *Reprovado*. O status “Verificado” deverá ser atribuído somente após uma aprovação autorizada.
+* **RNFs relacionados:** RNF05, RNF06, RNF07 e RNF13.
+* **Justificativa:** O envio de documentos não significa que o profissional foi aprovado. Um fluxo de estados explícito reduz inconsistências e permite controlar as transições permitidas entre as etapas.
+* **Impacto esperado:** Maior confiabilidade na verificação dos profissionais e rastreabilidade das alterações de status.
+
+### DA07 — Interface com feedback e validação de campos
+* **Decisão:** Desenvolver formulários com campos identificados, validação de entradas, mensagens de erro e indicadores do estado das operações.
+* **RNFs relacionados:** RNF09, RNF10, RNF11 e RNF12.
+* **Justificativa:** O sistema possui diferentes tipos de usuários e operações. Instruções claras ajudam a evitar erros no cadastro, enquanto mensagens de confirmação orientam o usuário durante a busca, o envio de documentos e a gestão de chamados.
+* **Impacto esperado:** Melhor experiência de uso e redução de erros durante as operações.
+
+### DA08 — Cópias de segurança e monitoramento
+* **Decisão:** Implementar cópias de segurança periódicas, monitoramento dos serviços e procedimentos documentados de restauração.
+* **RNFs relacionados:** RNF14, RNF15 e RNF17.
+* **Justificativa:** Falhas de infraestrutura ou erros operacionais podem comprometer o acesso aos dados. O monitoramento permite identificar problemas, enquanto os backups possibilitam a recuperação das informações.
+* **Impacto esperado:** Maior continuidade do serviço e menor risco de perda de dados.
+
+---
+
+## 5. Matriz de Rastreabilidade (RNFs, Histórias de Usuário e Decisões Arquiteturais)
+A matriz abaixo demonstra como cada requisito não funcional influencia as decisões arquiteturais e quais histórias de usuário são afetadas:
+
+| RNF | Histórias Relacionadas | Decisões Arquiteturais |
+| :--- | :--- | :--- |
+| **RNF01 — Tempo de resposta** | US 1.1, US 1.2, US 2.1, US 2.2 e US 4.1 | DA01, DA05 e DA07 |
+| **RNF02 — Desempenho da busca** | US 2.1 e US 2.2 | DA05 |
+| **RNF03 — Processamento de chamados** | US 4.1 | DA01, DA02 e DA07 |
+| **RNF04 — Proteção de dados** | US 1.1, US 1.2, US 1.3, US 1.5 e US 2.1 | DA03 e DA04 |
+| **RNF05 — Proteção de documentos** | US 1.3 | DA03, DA04 e DA06 |
+| **RNF06 — Autenticação e autorização** | US 1.1, US 1.2, US 1.3, US 1.5, US 2.1 e US 4.1 | DA03 e DA06 |
+| **RNF07 — Integridade da verificação** | US 1.1 e US 1.3 | DA03 e DA06 |
+| **RNF08 — Proteção das comunicações** | US 1.3 e US 1.5 | DA03 e DA04 |
+| **RNF09 — Facilidade de cadastro** | US 1.1, US 1.2 e US 1.5 | DA07 |
+| **RNF10 — Facilidade de busca** | US 2.2 | DA05 e DA07 |
+| **RNF11 — Orientação na validação** | US 1.3 | DA06 e DA07 |
+| **RNF12 — Feedback das operações** | US 1.1, US 1.2 e US 4.1 | DA07 |
+| **RNF13 — Consistência dos dados** | US 1.1, US 1.2, US 1.3, US 2.1 e US 4.1 | DA02 e DA06 |
+| **RNF14 — Disponibilidade** | US 2.1 e US 2.2 | DA05 e DA08 |
+| **RNF15 — Recuperação de falhas** | Todas as histórias que dependem de dados persistidos | DA02 e DA08 |
+| **RNF16 — Manutenibilidade** | US 1.1 e US 1.2, além das demais funcionalidades | DA01 |
+| **RNF17 — Testabilidade** | Todas as histórias | DA01, DA02, DA05, DA06 e DA08 |
